@@ -72,11 +72,11 @@ angular.module('app.services', ['ngCordova'])
   };
 
   //this.checkVisited = function(routeId, userId, stopId) {
-    //var userRouteStop = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/users/'+userId+'/routes/'+routeId+'/'+stopId));
-    //return userRouteStop.$loaded().then(function(data) { //TODO research loaded more and best prac. always load and deal with save promises?
-      //debugger;
-      //return (data.$value);
-    //});
+  //var userRouteStop = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/users/'+userId+'/routes/'+routeId+'/'+stopId));
+  //return userRouteStop.$loaded().then(function(data) { //TODO research loaded more and best prac. always load and deal with save promises?
+  //debugger;
+  //return (data.$value);
+  //});
   //};
 
   this.getVisitedStops = function(routeId, userId){
@@ -89,22 +89,25 @@ angular.module('app.services', ['ngCordova'])
 })
 
 
+
 .service('YelpService',function($http,LocationService, ReadFileService){
+
+  this._readConfigData = function() {
+    if (this.configData) return;
+    ReadFileService.readFile('../config.json').then(function(data){  //omg this is making an http request to read a file?
+      this.configData = data;
+      debugger;
+    });
+  };
   this.getLocalBusinesses = function(loc,callback) {
     var that= this;
-    function randomString(length, chars) {
+    var randomString = function(length, chars) {
       var result = '';
       for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
       return result;
-    }
-    ReadFileService.readFile('../config.json')
-    .then(function(data1){
-      var auth = data1.data;
-      var method = 'GET';
+    };
+      var auth = this.configData;
       var url = 'http://api.yelp.com/v2/search';
-      var consumerSecret = auth.oauth_consumer_secret; //Consumer Secret
-      var tokenSecret = auth.oauth_token_secret; //Token Secret
-      var time =new Date().getTime();
       var params = {
         term: 'food',
         callback: 'angular.callbacks._0',
@@ -113,16 +116,17 @@ angular.module('app.services', ['ngCordova'])
         oauth_consumer_key: auth.oauth_consumer_key, //Consumer Key
         oauth_token: auth.oauth_token, //Token
         oauth_signature_method: auth.oauth_signature_method,
-        oauth_timestamp: time,
+        oauth_timestamp: Date.now(), //faster
         oauth_version: '1.0',
         oauth_nonce: randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
       };
-      var signature = oauthSignature.generate(method, url, params, consumerSecret, tokenSecret, { encodeSignature: true});
+      var signature = oauthSignature.generate('GET', url, params, auth.oauth_consumer_secret, auth.oauth_token_secret, { encodeSignature: true});
       params.oauth_signature = signature;
       $http.jsonp(url,{params:params}).success(function(data){
+        debugger;
+        console.log(data);
         that.parseData(data,callback);
       });
-    });
   };
 
   this.parseData = function(data,callback) {
@@ -205,17 +209,10 @@ angular.module('app.services', ['ngCordova'])
    * @param {string} image - path to image file
    */
 
-  this.getStationLocation = function(map, route, stops, cb) {
+  this.getStationLocation = function(map, route, stops, cb) { //TODO refactor no need cb
     var stop = _.find(stops, function(stop) { return stop.id === route.stop.id });
-    //debugger;
     this.closestStop = {id: route.stop.id, loc: {latitude: stop.lat, longitude: stop.lon}};
-    //
-    //ReadFileService.readFile('../stops.json')
-    //.then(function(data) {
-    //var station = data.data[route.stop.id];
-    //this.closestStop = {id: route.stop.id, loc: {latitude: station.lat, longitude: station.lon}};
     cb();
-    //}.bind(this));
 
   };
 
@@ -253,7 +250,7 @@ angular.module('app.services', ['ngCordova'])
    * Read a specific file
    * @param {string} loc - location of file
    */
-  this.readFile = function(loc) {
+  this.readFile = function(loc) { //get rid of this please, refactor
     return $http({
       url: loc,
       method: 'GET'

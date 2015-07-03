@@ -12,7 +12,7 @@ angular.module('app.details', [])
 
     RestBusService.getStationLocation($scope.map, route, $scope.stops, function() { //ugh refactor still needed, buncha shit together TODO but necessary this way for now
       var imgName = 'stop';
-      if (userId) {
+      if ($scope.userId) {
         FirebaseService.visitStop(route.route.id, userId, RestBusService.closestStop.id); //user optionally logged in
         FirebaseService.getVisitedStops().then(function(stops) {
           console.log(stops); //incorrect TODO;
@@ -45,12 +45,12 @@ angular.module('app.details', [])
           });
         });
       });
-      var stopLocs = [];
-      for (var i = 0; i < data.stops.length; i++) {
-        stopLocs.push([data.stops[i].lat,data.stops[i].lon]);
-      }
-      MapService.createRouteLine(stopLocs,$scope.map);
-      google.maps.event.addDomListener(window, 'load');
+
+      //polylines
+      MapService.createRouteLine(data.stops.map(function(stop) {
+        return [stop.lat, stop.lon];
+      }), $scope.map);
+      //google.maps.event.addDomListener(window, 'load'); //TODO why
     });
     //$scope.stops = data.stops;
     //_.pluck(data.stops, 
