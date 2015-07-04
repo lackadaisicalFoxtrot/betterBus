@@ -1,8 +1,7 @@
   angular.module('app.home', [])
 
-.controller('HomeController', function($scope, routes, RestBusService,$firebaseObject,FirebaseService) {
-    
-    
+.controller('HomeController', function($scope, routes, RestBusService,$firebaseObject,FirebaseService, YelpService) {
+  YelpService._readConfigData(); //TODO encapsulate better but ok for now. auth keys read and stored in mem
     $scope.routes = routes;
 
     
