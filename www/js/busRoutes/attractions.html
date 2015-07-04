@@ -1,11 +1,9 @@
-<ion-view view-title="Test">
+<ion-view view-title="Leaderboard">
 	<ion-content class="padding">
 		<ion-item>
-			<!-- not sure if scrollable div via overflow is working...needs testing -->
-			<div style="overflow-y: scroll;" ng-repeat="item in testData.businesses">
-			  <p><strong> {{ item.name }} </strong></p>
-			  <p> {{ item.number }} </p>
-			  <p> {{ item.location }} </p>
+			<div ng-repeat=" items in scores | orderBy: '-points'">
+			  <p>{{ items.user}} : {{ items.points}}</p>
 			</div>
 		</ion-item>
 </ion-view>
+

@@ -6,12 +6,11 @@
     <p>{{ route.stop.title }}</p>
     <p>{{ route.stop.distance }}</p>
     <div ng-repeat="value in route.values">
-      <p><strong>{{ value.direction.title }}</strong></p>
+      <p><strong>{{ value.direction.title }}</strong></p>s
       <p>{{ value.minutes }} Minutes</p>
     </div>
     </ion-item>
 
-    <!-- not sure why page fails to load when the below two lines are deleted -->
     <ion-item style='margin: 0; padding: 0; height: 400px;'>
     <ion-content id='mapContainer'></ion-content>
     </ion-item>
@@ -19,11 +18,9 @@
 
 
  <ion-footer-bar class="bar-assertive">
-   <div class="buttons">
-     <button class="button" align="center" ng-click="redirect()">
-      Attractions along your route
-     <button>
-   </div>
+     <a class="button" align="center" ui-sref="app.attractions({uniqId:route.route.id})">
+      View user score
+     </a>
  </ion-footer-bar>
 
 

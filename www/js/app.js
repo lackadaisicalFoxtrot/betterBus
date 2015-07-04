@@ -96,7 +96,7 @@ angular.module('app', [
             ////state params etc?
           //},
 
-          userLocation: function(LocationService) {
+          userLocation: function(LocationService) { 
             return LocationService.getCurrentLocation();
           }
         }
@@ -128,11 +128,16 @@ angular.module('app', [
       })
       //below is 'attractions' route
       .state('app.attractions', {
-        url: '/attractions',
+        url: '/attractions/:uniqId',
         views: {
           'menuContent': {
             templateUrl: 'js/busRoutes/attractions.html',
             controller: 'AttractionsController'
+          }
+        },
+        resolve: {
+          route: function($stateParams, RestBusService) {
+            return $stateParams.uniqId;
           }
         }
       })

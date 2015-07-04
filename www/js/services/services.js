@@ -68,6 +68,25 @@ angular.module('app.services', ['ngCordova'])
       console.log('firebase failed to pull route data');
     });
   };
+  this.getStopScore = function(routeId, cb){
+      //var route = $firebaseObject(new Firebase('http://betterbus.com/routes/'+routeId+'.json'));
+    var route = new Firebase('https://betterbus.firebaseio.com/routes/' + routeId);
+    var scores = [];
+      route.orderByValue().on("value", function(snapshot) {
+        snapshot.forEach(function(data) {
+          var score = {};
+          var points = data.val();
+          var user = data.key();
+          score.user = user;
+          score.points = points;
+          scores.push(score);
+        });
+
+        console.log('----', scores);
+        
+      });
+    cb(scores);
+  }
 })
 .service('YelpService',function($http,LocationService, ReadFileService){
   this.getLocalBusinesses = function(loc,callback) {
