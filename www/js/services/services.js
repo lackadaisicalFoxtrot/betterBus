@@ -82,7 +82,6 @@ angular.module('app.services', ['ngCordova'])
           scores.push(score);
         });
 
-        console.log('----', scores);
         
       });
     cb(scores);
