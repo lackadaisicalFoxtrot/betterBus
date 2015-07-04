@@ -96,7 +96,7 @@ angular.module('app', [
             ////state params etc?
           //},
 
-          userLocation: function(LocationService) {
+          userLocation: function(LocationService) { 
             return LocationService.getCurrentLocation();
           }
         }
@@ -126,12 +126,19 @@ angular.module('app', [
           }
         }
       })
+
       .state('app.leaderboard', {
-        url: '/leaderboard', //TODO restful (/:routeid/leaderboard)
+        url: '/leaderboard/:uniqId', //TODO restful (/:routeid/leaderboard)
+
         views: {
           'menuContent': {
             templateUrl: 'js/busRoutes/leaderboard.html',
             controller: 'LeaderboardController'
+          }
+        },
+        resolve: {
+          route: function($stateParams, RestBusService) {
+            return $stateParams.uniqId;
           }
         }
       });
