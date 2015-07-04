@@ -2,6 +2,7 @@ angular.module('app.leaderboard', [])
 	
 
 	.controller('LeaderboardController', function($scope, route, FirebaseService, RestBusService){
+
 		
 		console.log('has loaded');
 

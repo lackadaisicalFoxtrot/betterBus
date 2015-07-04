@@ -44,6 +44,7 @@ angular.module('app.details', [])
         }
       });
     });
+
   };
 
 
@@ -65,6 +66,8 @@ angular.module('app.details', [])
             $scope.visitedStops.push(stop.$id);
           });
           $scope.addStopMarkers(data.stops, true);
+
+
         });
       } else {
         $scope.addStopMarkers(data.stops, false);

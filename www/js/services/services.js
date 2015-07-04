@@ -70,9 +70,11 @@ angular.module('app.services', ['ngCordova'])
           score.user = user;
           score.points = points;
           scores.push(score);
+
         });
 
-        
+
+
       });
     cb(scores);
   }
