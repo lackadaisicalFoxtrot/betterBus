@@ -44,7 +44,9 @@ angular.module('app.details', [])
         }
       });
     });
+
   };
+
 
   RestBusService.getRouteDetailed(route.route.id) //since the app.details stateparams only use the uniqId for now, it doesn't have the route info so we can't do it all in the app.js router part like they did for route
   .then(function(data) {
@@ -52,6 +54,7 @@ angular.module('app.details', [])
 
     RestBusService.getStationLocation($scope.map, route, $scope.stops, function() { //TODO refactor
       var imgName = 'stop';
+
 
       $scope.stationMarker = MapService.createMarker($scope.map, RestBusService.closestStop.loc, './img/station.png');
 
@@ -63,6 +66,8 @@ angular.module('app.details', [])
             $scope.visitedStops.push(stop.$id);
           });
           $scope.addStopMarkers(data.stops, true);
+
+
         });
       } else {
         $scope.addStopMarkers(data.stops, false);
