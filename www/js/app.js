@@ -6,7 +6,7 @@ angular.module('app', [
     'app.services',
     'angular-toArrayFilter',
     'app.auth',
-    'app.attractions',
+    'app.leaderboard',
     'app.filters', 
     'firebase'
   ])
@@ -101,22 +101,22 @@ angular.module('app', [
           }
         }
       })
-      // .state('app.login', {
-      //   url: '/login',
-      //   views: {
-      //     'menuContent': {
-      //       templateUrl: 'js/auth/login.html'
-      //     }
-      //   }
-      // })
-      // .state('app.signup', {
-      //   url: '/signup',
-      //   views: {
-      //     'menuContent': {
-      //       templateUrl: 'js/auth/signup.html'
-      //     }
-      //   }
-      // })
+       .state('app.login', {
+         url: '/login',
+         views: {
+           'menuContent': {
+             templateUrl: 'js/auth/login.html'
+           }
+         }
+       })
+       .state('app.signup', {
+         url: '/signup',
+         views: {
+           'menuContent': {
+             templateUrl: 'js/auth/signup.html'
+           }
+         }
+       })
       .state('app.filters', {
         url: '/filters', 
         views: {
@@ -126,13 +126,14 @@ angular.module('app', [
           }
         }
       })
-      //below is 'attractions' route
-      .state('app.attractions', {
-        url: '/attractions/:uniqId',
+
+      .state('app.leaderboard', {
+        url: '/leaderboard', //TODO restful (/:routeid/leaderboard)
+
         views: {
           'menuContent': {
-            templateUrl: 'js/busRoutes/attractions.html',
-            controller: 'AttractionsController'
+            templateUrl: 'js/busRoutes/leaderboard.html',
+            controller: 'LeaderboardController'
           }
         },
         resolve: {
@@ -140,7 +141,7 @@ angular.module('app', [
             return $stateParams.uniqId;
           }
         }
-      })
+      });
   })
   .controller('AppController', function($scope){
   })

@@ -2,12 +2,13 @@
   <ion-content ng-controller="LoginController" class="padding">
     <div class="list list-inset">
       <label class="item item-input">
-        <input type="text" placeholder="Username" ng-model="data.username">
+        <input type="text" placeholder="Username" ng-model="email">
       </label>
       <label class="item item-input">
-        <input type="password" placeholder="Password" ng-model="data.password">
+        <input type="password" placeholder="Password" ng-model="password">
       </label>
     </div>
-    <button class="button button-block button-calm" ng-click="login()">Login</button>
+    <button class="button button-block button-calm" ng-click="submit()">Login</button>
+    <a ui-sref = 'app.signup'><button class = 'button button-block'>Sign up to play</button></a>
   </ion-content>
 </ion-view>

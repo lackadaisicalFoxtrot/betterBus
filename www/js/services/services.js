@@ -36,36 +36,26 @@ angular.module('app.services', ['ngCordova'])
 
 })
 
-.service('FirebaseService', function($firebaseObject){
-  this.updateUserRoute= function(routeId, userId,stops){
-    var route = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/routes/'+routeId));
-    route.$loaded(function(data){
-      route[userId] = stops;
-      route.$save();
-    },function(err){
-      console.log('error getting route firebase');
-    });
-    
-  };
+.service('FirebaseService', function($firebaseObject, $firebaseArray){
+
   this.visitStop = function(routeId, userId, stopId){
-    var route = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/users/'+userId+'/'+routeId));
-    route.$loaded(function(data){
-      route.stopId = true;
-      route.$save();
-    },function(err){
-      console.log('error getting route firebase');
-    });
+    var userRouteStop = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/users/'+userId+'/routes/'+routeId+'/'+stopId));
+    if (userRouteStop.$value) return; //already visited stop before
+    userRouteStop.$value = true;
+    userRouteStop.$save(); //TODO deal with promise 
+
+    //redundantish data but easier to find
+    var routeUser = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/routes/'+routeId+'/'+userId));
+    //val is the num stops
+    routeUser.$value = routeUser.$value || 0;
+    routeUser.$value++;
+    routeUser.$save();
   };
-  this.getVisitedRoutes = function(routeId, userId){
-    var route = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/users'+userId+'/'+routeId));
-    var result = [];
-    route.$loaded(function(data){
-      for(var stopId in route){
-        result.push(stopId);
-      }
-      return result;
-    }, function(err){
-      console.log('firebase failed to pull route data');
+
+  this.getVisitedStops = function(routeId, userId){
+    var stops = $firebaseArray(new Firebase('https://betterbus.firebaseio.com/users/'+userId+'/routes/'+routeId));
+    return stops.$loaded(function(data){
+      return data;
     });
   };
   this.getStopScore = function(routeId, cb){
@@ -87,6 +77,8 @@ angular.module('app.services', ['ngCordova'])
     cb(scores);
   }
 })
+
+
 .service('YelpService',function($http,LocationService, ReadFileService){
   this.getLocalBusinesses = function(loc,callback) {
     var that= this;
@@ -104,17 +96,17 @@ angular.module('app.services', ['ngCordova'])
       var tokenSecret = auth.oauth_token_secret; //Token Secret
       var time =new Date().getTime();
       var params = {
-              term: 'food',
-              callback: 'angular.callbacks._0',
-              ll: loc.latitude+','+loc.longitude,
-              // location: 'San+Francisco',
-              oauth_consumer_key: auth.oauth_consumer_key, //Consumer Key
-              oauth_token: auth.oauth_token, //Token
-              oauth_signature_method: auth.oauth_signature_method,
-              oauth_timestamp: time,
-              oauth_version: '1.0',
-              oauth_nonce: randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-          };
+        term: 'food',
+        callback: 'angular.callbacks._0',
+        ll: loc.latitude+','+loc.longitude,
+        // location: 'San+Francisco',
+        oauth_consumer_key: auth.oauth_consumer_key, //Consumer Key
+        oauth_token: auth.oauth_token, //Token
+        oauth_signature_method: auth.oauth_signature_method,
+        oauth_timestamp: time,
+        oauth_version: '1.0',
+        oauth_nonce: randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+      };
       var signature = oauthSignature.generate(method, url, params, consumerSecret, tokenSecret, { encodeSignature: true});
       params.oauth_signature = signature;
       $http.jsonp(url,{params:params}).success(function(data){
@@ -135,11 +127,11 @@ angular.module('app.services', ['ngCordova'])
   //create info window
   this.formatData = function(item) {
     return '<h4>' + item.name + '</h4>' +
-           '<h5>' + item.location.address[0] + '</h5>' +
-           '<img src="' + item.image_url + '"/>' +
-           '<h5>Phone: <a href="tel:' + item.phone + '">' + item.phone + '</a></h5>' +
-           '<img src="' + item.rating_img_url_small + '"/>' +
-           '<h5>Number of Reviews: ' + item.review_count +'</h5>'
+      '<h5>' + item.location.address[0] + '</h5>' +
+      '<img src="' + item.image_url + '"/>' +
+      '<h5>Phone: <a href="tel:' + item.phone + '">' + item.phone + '</a></h5>' +
+      '<img src="' + item.rating_img_url_small + '"/>' +
+      '<h5>Number of Reviews: ' + item.review_count +'</h5>'
   };
 
 })
@@ -180,7 +172,7 @@ angular.module('app.services', ['ngCordova'])
   // this.getStops = function(){
   //   var dfd = $q.defer();
   //   var routes = [];
-    
+
   // }
   /** 
    * Gets the route information from the route clicked on the home screen 
@@ -203,14 +195,17 @@ angular.module('app.services', ['ngCordova'])
    * @param {string} image - path to image file
    */
 
-  this.getStationLocation = function(map, route, image) {
-
-    ReadFileService.readFile('../stops.json')
-    .then(function(data) {
-      var station = data.data[route.stop.id];
-      var loc = {latitude: station.lat, longitude: station.lon};
-      MapService.createMarker(map, loc, image);
-    });
+  this.getStationLocation = function(map, route, stops, cb) {
+    var stop = _.find(stops, function(stop) { return stop.id === route.stop.id });
+    //debugger;
+    this.closestStop = {id: route.stop.id, loc: {latitude: stop.lat, longitude: stop.lon}};
+    //
+    //ReadFileService.readFile('../stops.json')
+    //.then(function(data) {
+    //var station = data.data[route.stop.id];
+    //this.closestStop = {id: route.stop.id, loc: {latitude: station.lat, longitude: station.lon}};
+    cb();
+    //}.bind(this));
 
   };
 
@@ -268,7 +263,22 @@ angular.module('app.services', ['ngCordova'])
     var mapOptions = {center: {lat: loc.latitude, lng: loc.longitude}, zoom: 17};
     return new google.maps.Map(document.getElementById('mapContainer'), mapOptions);
   };
-
+  
+  //takes array of twopals lat/long and the map
+  this.createRouteLine= function(locArray,map){
+    var googleCoords = [];
+    for (var i = 0; i < locArray.length; i++) {
+      googleCoords.push(new google.maps.LatLng(locArray[i][0],locArray[i][1]));
+    }
+    var line = new google.maps.Polyline({
+      path: googleCoords,
+      geodesic: true,
+      strokeColor: '#FF0000',
+      strokeOpacity: 1.0,
+      strokeWeight: 2
+    });
+    line.setMap(map);
+  };
   /**
    * Creates a marker on a google maps map
    * @param {object} map - Instance to place markers on
@@ -321,7 +331,7 @@ angular.module('app.services', ['ngCordova'])
 
       //refresh the marker on map
       vehicleMarker.marker.setMap(null); vehicleMarker.marker.setMap(map);
-    }
+    };
 
     google.maps.event.addListener(vehicleMarker.marker, 'click', function() {
       toggle();
@@ -354,6 +364,13 @@ angular.module('app.services', ['ngCordova'])
 
     return markersArray;
   };
+
+  //this.refreshStationMarker = function(marker){
+  //if (!marker) return;
+  //this.getStationLocation(
+  //marker.setPosition(new google.maps.LatLng(data.latitude, data.longitude));
+  //RestBusService.getStationLocation(map, route);
+  //};
 
   /**
    * refresh user marker location
@@ -399,11 +416,47 @@ angular.module('app.services', ['ngCordova'])
           vehicleMarkers[vehicles[j].id].marker.setPosition(new google.maps.LatLng(lat, lng));
         }
       }
-
     });
 
   };
 
+})
+.service('SimpleAuthService', function($firebaseAuth){ //for quick mockup purposes, top level firebase
+  var ref = new Firebase('https://betterbus.firebaseio.com');
+  //auth = $firebaseAuth(ref);
+  this.createUser = function(e, pw, cb) { //auth.$createUser
+    ref.createUser({
+      email    : e,
+      password : pw
+    }, function(error, userData) {
+      if (error) {
+        console.log("Error creating user:", error);
+      } else {
+        console.log("Successfully created user account with uid:", userData.uid);
+        cb();
+      }
+    });
+  };
+  this.loginUser = function(e, pw, success, err) {
+    //or auth.$authWithPassword
+    ref.authWithPassword({
+      email    : e,
+      password : pw
+    }, function(error, authData) {
+      if (error) {
+        console.log("Login Failed!", error);
+        err();
+      } else {
+        ref.child('users').child(authData.uid).update({email: authData.password.email});
+        console.log("Authenticated successfully with payload:", authData);
+        this.authData = authData;
+        success();
+      }
+    }.bind(this));
+  };
+  //this.getUserId = function() {
+  //return this.userId; //TODO fix global
+  //};
 })
 .service('FilterService', function($firebaseArray){
   var filtersRef = new Firebase('https://betterbus.firebaseio.com/filters');
