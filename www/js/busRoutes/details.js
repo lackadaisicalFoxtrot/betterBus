@@ -3,10 +3,9 @@ angular.module('app.details', [])
   var authData = SimpleAuthService.authData;
   if (authData) {
     $scope.userId = authData.uid;
-    //FirebaseService.
   }
   //helpers
-  //stop here is the stopData[i] that has a marker, infoWindow, and yelpData (inprogress) associated
+  //stop here has potentially marker, infoWindow, and yelpData properties
   var makeWindow = function(stop) {
     var place = stop.yelpData[YelpService.feelingLucky(stop.yelpData.length)];
     if (!stop.infoWindow) {
@@ -26,10 +25,8 @@ angular.module('app.details', [])
   $scope.addStopMarkers = function(stops, hasUser) {
     var stopMapData = [];
     stops.forEach(function(stop, index) { //has to be inside cb to ensure isVisited set for now (deal with setVisited promise to fix)
-
       if (hasUser && $scope.visitedStops.indexOf(stop.id) > -1) imgName = 'stopVisited';
       else imgName = 'stop';
-      //$scope.stopMarkers[index] = MapService.createMarker($scope.map, {latitude: stop.lat, longitude: stop.lon}, './img/'+imgName+'.png');
       var marker = MapService.createMarker($scope.map, {latitude: stop.lat, longitude: stop.lon}, './img/'+imgName+'.png');
       stopMapData.push({marker: marker});
 
@@ -47,17 +44,6 @@ angular.module('app.details', [])
           showWindow(s);
         }
       });
-
-
-      //create event listener
-      //google.maps.event.addListener($scope.stopMarkers[index], 'click', function() {
-      //YelpService.getLocalBusinesses({latitude: stop.lat, longitude: stop.lon}, function(data) {
-      //var place = data[YelpService.feelingLucky(data.length)];
-      //new google.maps.InfoWindow({
-      //content: YelpService.formatData(place)
-      //}).open($scope.map, $scope.stopMarkers[index]);
-      //});
-      //});
     });
   };
 
@@ -69,7 +55,6 @@ angular.module('app.details', [])
       var imgName = 'stop';
 
       $scope.stationMarker = MapService.createMarker($scope.map, RestBusService.closestStop.loc, './img/station.png');
-      $scope.stopMarkers = [];
 
       if ($scope.userId) {
         $scope.visitedStops = [];
