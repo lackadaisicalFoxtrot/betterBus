@@ -36,26 +36,7 @@ angular.module('app.services', ['ngCordova'])
 
 })
 
-.service('FirebaseService', function($firebaseObject){
-  //this.update = function(routeId, userId) {
-  //var routeRef = new Firebase('https://betterbus.firebaseio.com/routes/'+routeId);
-  //var userRef = new Firebase('https://betterbus.firebaseio.com/users/'+userId);
-  //userRef.
-  //routeref.update(userId, num_stops);
-  //};
-  //this.setNumStops = function(numStops, routeId, userId){
-  //var routeUserRef = new Firebase('https://betterbus.firebaseio.com/routes/'+routeId+'/'+userId);
-  //var numStops = numStops || 0;
-  //routeUserRef.set(num_stops || 0);
-  //};
-  //routeref.update({userId: });
-  //var route = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/routes/'+routeId));
-  //route.$loaded(function(data){
-  //route[userId] = stops;
-  //route.$save();
-  //},function(err){
-  //console.log('error getting route firebase');
-  //});
+.service('FirebaseService', function($firebaseObject, $firebaseArray){
 
   this.visitStop = function(routeId, userId, stopId){
     var userRouteStop = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/users/'+userId+'/routes/'+routeId+'/'+stopId));
@@ -71,17 +52,8 @@ angular.module('app.services', ['ngCordova'])
     routeUser.$save();
   };
 
-  //this.checkVisited = function(routeId, userId, stopId) {
-  //var userRouteStop = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/users/'+userId+'/routes/'+routeId+'/'+stopId));
-  //return userRouteStop.$loaded().then(function(data) { //TODO research loaded more and best prac. always load and deal with save promises?
-  //debugger;
-  //return (data.$value);
-  //});
-  //};
-
   this.getVisitedStops = function(routeId, userId){
-    debugger;
-    var stops = $firebaseObject(new Firebase('https://betterbus.firebaseio.com/users/'+userId+'/routes/'+routeId));
+    var stops = $firebaseArray(new Firebase('https://betterbus.firebaseio.com/users/'+userId+'/routes/'+routeId));
     return stops.$loaded(function(data){
       return data;
     });
@@ -267,6 +239,7 @@ angular.module('app.services', ['ngCordova'])
     var mapOptions = {center: {lat: loc.latitude, lng: loc.longitude}, zoom: 17};
     return new google.maps.Map(document.getElementById('mapContainer'), mapOptions);
   };
+  
   //takes array of twopals lat/long and the map
   this.createRouteLine= function(locArray,map){
     var googleCoords = [];

@@ -3,7 +3,7 @@
   <ion-content ng-controller="SignupController" class="padding">
     <div class="list list-inset">
       <label class="item item-input">
-        <input type="text" placeholder="Email" ng-model="email">
+        <input type="email" placeholder="Email" ng-model="email" required/>
       </label>
       <label class="item item-input">
         <input type="password" placeholder="Password" ng-model="password">
@@ -11,6 +11,8 @@
       <label class="item item-input">
         <input type="password" placeholder="Confirm Password" ng-model="confirmPassword">
       </label>
+      <div class='passwordPopup'>Passwords Do Not Match</div>
+      <div class='emailPopup'>Input is not valid email</div>
     </div>
     <button class="button button-block button-calm" ng-click="submit()">Sign up</button>
   </ion-content>

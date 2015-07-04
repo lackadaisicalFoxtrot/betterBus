@@ -19,10 +19,30 @@ angular.module('app.auth', ['ionic'])
     SimpleAuthService.loginUser($scope.email, $scope.password, LoginFactory.success, LoginFactory.error);
   };
 })
+
 .controller('SignupController', function($scope, SimpleAuthService, $state, LoginFactory) {
+  $('.passwordPopup').toggle(false);
+  $('.emailPopup').toggle(false);
+
+  $scope.regex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
   $scope.submit = function() {
-    SimpleAuthService.createUser($scope.email, $scope.password, function() {
-      SimpleAuthService.loginUser($scope.email, $scope.password, LoginFactory.success, LoginFactory.error);
+    $('.passwordPopup').toggle(false);
+    $('.emailPopup').toggle(false);
+    var email = true;
+    if(!$scope.regex.test($scope.email)){
+      console.log('wrong email');
+      $('.emailPopup').toggle(true);
+      email=false;
+    }
+    if($scope.password===$scope.confirmPassword && email){
+
+      SimpleAuthService.createUser($scope.email, $scope.password, function() {
+        SimpleAuthService.loginUser($scope.email, $scope.password, LoginFactory.success, LoginFactory.error);
     });
+    }
+    else if($scope.password!==$scope.confirmPassword){
+      $('.passwordPopup').toggle(true);
+    }
+
   };
 });
