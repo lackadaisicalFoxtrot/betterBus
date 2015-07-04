@@ -128,7 +128,7 @@ angular.module('app', [
       })
 
       .state('app.leaderboard', {
-        url: '/leaderboard', //TODO restful (/:routeid/leaderboard)
+        url: '/leaderboard/:uniqId', //TODO restful (/:routeid/leaderboard)
 
         views: {
           'menuContent': {
