@@ -4,7 +4,7 @@ angular.module('app.details', [])
   if (authData) {
     $scope.userId = authData.uid;
   }
-  //helpers
+  //helpers. really should move elsewhere like MapService or Yelp
   //stop here has potentially marker, infoWindow, and yelpData properties
   var makeWindow = function(stop) {
     var place = stop.yelpData[YelpService.feelingLucky(stop.yelpData.length)];
@@ -20,7 +20,6 @@ angular.module('app.details', [])
     makeWindow(stop); //ugh DRY pls
     stop.infoWindow.open($scope.map, stop.marker);
   };
-
 
   $scope.addStopMarkers = function(stops, hasUser) {
     var stopMapData = [];
@@ -63,7 +62,6 @@ angular.module('app.details', [])
           stops.forEach(function(stop) {
             $scope.visitedStops.push(stop.$id);
           });
-
           $scope.addStopMarkers(data.stops, true);
         });
       } else {
@@ -71,10 +69,6 @@ angular.module('app.details', [])
       }
     });
 
-    //polylines
-    MapService.createRouteLine(data.stops.map(function(stop) {
-      return [stop.lat, stop.lon];
-    }), $scope.map);
   });
 
   $scope.route = route;
@@ -93,7 +87,11 @@ angular.module('app.details', [])
     $scope.$broadcast('scroll.refreshComplete');
   };
 
-  $scope.drawLine = function(){
+  //polylines
+  //MapService.createRouteLine(data.stops.map(function(stop) {
+    //return [stop.lat, stop.lon];
+  //}), $scope.map);
+  var drawRoute = function(){
     var routeId = $scope.route.route.id;
     $.ajax({
       url: "http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=sf-muni&r="+routeId,
@@ -113,7 +111,8 @@ angular.module('app.details', [])
       }
     });
   };
-  $scope.drawLine();
+  drawRoute();
+
   //Initial page load
   $scope.doRefresh();
 
